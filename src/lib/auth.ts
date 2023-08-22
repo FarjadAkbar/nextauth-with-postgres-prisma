@@ -17,6 +17,27 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      async profile(profile) {
+        // Fetch user's verification status from the database
+        const user = await prisma.user.findUnique({
+          where: {
+            email: profile.email,
+          },
+        });
+
+        if (user && user.isVerified) {
+          // Allow login for verified users
+          return {
+            id: user.id,
+            email: profile.email,
+            name: profile.name,
+            randomKey: "Hey cool",
+          };
+        } else {
+          // Prevent login for unverified users
+          return null;
+        }
+      },
     }),
     CredentialsProvider({
       name: "Sign in",
@@ -28,7 +49,7 @@ export const authOptions: NextAuthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials: { email: string; password: string }) {
         if (!credentials?.email || !credentials.password) {
           return null;
         }
@@ -53,17 +74,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    session: ({ session, token }) => {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.id,
-          randomKey: token.randomKey,
-        },
-      };
-    },
-    jwt: ({ token, user }) => {
+    jwt: ({token, user}) => {
       if (user) {
         const u = user as unknown as any;
         return {
@@ -73,6 +84,23 @@ export const authOptions: NextAuthOptions = {
         };
       }
       return token;
+    },
+
+    session: ({session, token}) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          randomKey: token.randomKey,
+        },
+      };
+    },
+    signIn(user: { isVerified: boolean }) {
+      if (!user.isVerified) {
+        return false; // Return false to prevent login
+      }
+      return true; // Allow login for verified users
     },
   },
 };
