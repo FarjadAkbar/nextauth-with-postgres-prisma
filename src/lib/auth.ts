@@ -7,9 +7,6 @@ import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma as any),
-  pages: {
-    signIn: "/login",
-  },
   session: {
     strategy: "jwt",
   },
@@ -19,39 +16,47 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
     CredentialsProvider({
-      name: "Sign in",
+      id: "credentials",
+      name: "my-project",
       credentials: {
         email: {
-          label: "Email",
+          label: "email",
           type: "email",
-          placeholder: "example@example.com",
+          placeholder: "jsmith@example.com",
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
-          return null;
-        }
+      async authorize(credentials, req) {
+        const payload = {
+          email: credentials?.email,
+          password: credentials?.password,
+        };
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
+        const res = await fetch("https://api.storerestapi.com/auth/login", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "application/json",
           },
         });
 
-        if (!user || !(await compare(credentials.password, user.password!))) {
-          return null;
+        const user = await res.json();
+        if (!res.ok) {
+          throw new Error(user.message);
+        }
+        // If no error and we have user data, return it
+        if (res.ok && user) {
+          return user;
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          randomKey: "Hey cool",
-        };
+        // Return null if user data could not be retrieved
+        return null;
       },
     }),
   ],
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
     session: ({ session, token }) => {
       return {
