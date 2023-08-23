@@ -23,10 +23,10 @@ export async function PUT(req: Request) {
   const userId = req.url.split("users/")[1]; // Assuming the id is part of the route query parameter
   const updatedUser = await prisma.user.update({
     where: {
-      id: Number(userId), // Convert the id to a number if needed
+      id: Number(userId),
     },
     data: {
-      isVerified: true, // Update the property you want
+      isVerified: true,
     },
   });
 
