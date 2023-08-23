@@ -53,9 +53,8 @@ export const RegisterForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/profile";
   const [loading, setLoading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [formValues, setFormValues] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
