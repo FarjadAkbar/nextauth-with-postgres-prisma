@@ -13,7 +13,39 @@ export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      async profile(profile) {
+        const user = await prisma.user.findUnique({
+          where: {
+            email: profile.email,
+          },
+        });
+        
+        if(!user){
+          const res = await fetch("/api/register", {
+            method: "POST",
+            body: JSON.stringify({
+              username: profile.name,
+              email: profile.email,
+              role: profile.role,
+              isVerified: 0
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+        }
+        if (user && user.isVerified === false) {
+          throw new Error("Admin not verified this account");
+        }
+
+        return {
+          id: profile.id.toString(), // Convert the id to a string
+          email: profile.email,
+          username: profile.name,
+          randomKey: "Hey cool",
+        };
+      }
     }),
     CredentialsProvider({
       name: "Sign in",
@@ -26,8 +58,12 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
-          return null;
+        if (!credentials?.email) {
+          throw new Error("Email is required");
+        }
+      
+        if (!credentials.password) {
+          throw new Error("Password is required");
         }
       
         const user = await prisma.user.findUnique({
@@ -36,10 +72,16 @@ export const authOptions: NextAuthOptions = {
           },
         });
       
+
         if (!user || !(await compare(credentials.password, user.password!))) {
-          return null;
+          throw new Error("Invalid Credential");
         }
       
+        
+        if (user && user.isVerified === false) {
+          throw new Error("Admin not verified this account");
+        }
+
         return {
           id: user.id.toString(), // Convert the id to a string
           email: user.email,
@@ -72,7 +114,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.id,
           randomKey: token.randomKey,
-        },
+        },  
       };
     },
   },
