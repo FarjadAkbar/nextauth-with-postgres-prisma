@@ -13,66 +13,40 @@ export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      async profile(profile) {
-        // Fetch user's verification status from the database
-        const user = await prisma.user.findUnique({
-          where: {
-            email: profile.email,
-          },
-        });
-
-        if (user && user.isVerified) {
-          // Allow login for verified users
-          return {
-            id: user.id,
-            email: profile.email,
-            name: profile.name,
-            randomKey: "Hey cool",
-          };
-        } else {
-          // Prevent login for unverified users
-          return null;
-        }
-      },
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
     }),
     CredentialsProvider({
-      id: "credentials",
-      name: "my-project",
+      name: "Sign in",
       credentials: {
         email: {
-          label: "email",
+          label: "Email",
           type: "email",
-          placeholder: "jsmith@example.com",
+          placeholder: "example@example.com",
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
-        const payload = {
-          email: credentials?.email,
-          password: credentials?.password,
-        };
-
-        const res = await fetch("https://api.storerestapi.com/auth/login", {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: {
-            "Content-Type": "application/json",
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials.password) {
+          return null;
+        }
+      
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email,
           },
         });
-
-        const user = await res.json();
-        if (!res.ok) {
-          throw new Error(user.message);
+      
+        if (!user || !(await compare(credentials.password, user.password!))) {
+          return null;
         }
-        // If no error and we have user data, return it
-        if (res.ok && user) {
-          return user;
-        }
-
-        // Return null if user data could not be retrieved
-        return null;
-      },
+      
+        return {
+          id: user.id.toString(), // Convert the id to a string
+          email: user.email,
+          username: user.username,
+          randomKey: "Hey cool",
+        };
+      }
     }),
   ],
   pages: {
@@ -100,12 +74,6 @@ export const authOptions: NextAuthOptions = {
           randomKey: token.randomKey,
         },
       };
-    },
-    signIn(user: { isVerified: boolean }) {
-      if (!user.isVerified) {
-        return false; // Return false to prevent login
-      }
-      return true; // Allow login for verified users
     },
   },
 };

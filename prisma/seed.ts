@@ -12,6 +12,7 @@ async function main() {
       email: "admin@admin.com",
       username: "Admin",
       password,
+      isVerified: true,
       role: "ADMIN"
     },
   });
