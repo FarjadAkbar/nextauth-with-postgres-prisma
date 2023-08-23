@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSearchParams } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 const FormSchema = z
   .object({
@@ -89,13 +90,21 @@ export const RegisterForm = () => {
         },
       });
 
-      setLoading(false);
-      if (!res.ok) {
-        setError((await res.json()).message);
-        return;
-      }
+      const u = await fetch("/api/users", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      signIn(undefined, { callbackUrl: "/" });
+      console.log(u);
+      // setLoading(false);
+      // if (!res.ok) {
+      //   setError((await res.json()).message);
+      //   return;
+      // }
+
+      // signIn(undefined, { callbackUrl: "/" });
     } catch (error: any) {
       setLoading(false);
       setError(error);

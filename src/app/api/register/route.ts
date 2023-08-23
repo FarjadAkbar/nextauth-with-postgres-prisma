@@ -1,6 +1,22 @@
+import { STATUS_BAD_REQUEST, STATUS_CONFLICT, STATUS_INTERNAL_SERVER_ERROR } from "@/constants";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
+
+
+// Validate required fields
+function validateFields(data: any) {
+  if (!data.username) {
+    return NextResponse.json({ error: "Username is required" }, { status: STATUS_BAD_REQUEST });
+  }
+  if (!data.email) {
+    return NextResponse.json({ error: "Email is required" }, { status: STATUS_BAD_REQUEST });
+  }
+  if (!data.password) {
+    return NextResponse.json({ error: "Password is required" }, { status: STATUS_BAD_REQUEST });
+  }
+  return null; // No validation errors
+}
 
 export async function POST(req: Request) {
   try {
@@ -10,12 +26,10 @@ export async function POST(req: Request) {
       password: string;
     };
 
-    if (email === null) {
-      throw new Error("Email is required");
-    }
-  
-    if (password === null) {
-      throw new Error("Password is required");
+    // Validate required fields
+    const validationError = validateFields({ username, email, password });
+    if (validationError) {
+      return validationError;
     }
 
     const userExist = await prisma.user.findUnique({
@@ -23,9 +37,9 @@ export async function POST(req: Request) {
         email: email,
       },
     });
-  
+
     if (userExist) {
-      throw new Error("Already Exist");
+      return NextResponse.json({ error: "User already exists" }, { status: STATUS_CONFLICT });
     }
 
     const hashed_password = await hash(password, 12);
@@ -50,7 +64,7 @@ export async function POST(req: Request) {
         status: "error",
         message: error.message,
       }),
-      { status: 500 }
+      { status: STATUS_INTERNAL_SERVER_ERROR }
     );
   }
 }
