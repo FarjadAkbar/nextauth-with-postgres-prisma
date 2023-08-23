@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
           return {
             id: user.id,
             email: profile.email,
-            name: profile.name,
+            username : profile.username,
             randomKey: "Hey cool",
           };
         } else {
@@ -48,25 +48,28 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
+        if (!credentials?.email || !credentials.password) {
+          return null;
+        }
+
         const payload = {
           email: credentials?.email,
           password: credentials?.password,
         };
 
-        const res = await fetch("https://api.storerestapi.com/auth/login", {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const user = await prisma.user.findUnique({
+          where: payload,
         });
 
-        const user = await res.json();
-        if (!res.ok) {
-          throw new Error(user.message);
+        if (!user) {
+          throw new Error("User is not registered");
+        }
+
+        if (user && !user.isVerified) {
+          throw new Error("User is not verified");
         }
         // If no error and we have user data, return it
-        if (res.ok && user) {
+        if (user && user.isVerified) {
           return user;
         }
 

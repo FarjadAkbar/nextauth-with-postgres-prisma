@@ -43,14 +43,6 @@ const FormSchema = z
     confirmPassword: z
       .string()
       .min(6, { message: "Please re-enter password correctly" }),
-    role: z.string().optional(),
-    mobileNumber: z
-      .string()
-      .min(10, { message: "Mobile number must be at least 10 characters" })
-      .max(11, {
-        message: "Mobile number must not be more than 11 characters",
-      })
-      .optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
@@ -67,37 +59,9 @@ export const RegisterForm = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "",
-    mobileNumber: "",
+    isVerified: 0
   });
   const [error, setError] = useState("");
-
-  // const onSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setFormValues({ name: "", email: "", password: "" });
-
-  //   try {
-  //     const res = await fetch("/api/register", {
-  //       method: "POST",
-  //       body: JSON.stringify(formValues),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-
-  //     setLoading(false);
-  //     if (!res.ok) {
-  //       setError((await res.json()).message);
-  //       return;
-  //     }
-
-  //     signIn(undefined, { callbackUrl: "/" });
-  //   } catch (error: any) {
-  //     setLoading(false);
-  //     setError(error);
-  //   }
-  // };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -116,19 +80,11 @@ export const RegisterForm = () => {
         </pre>
       ),
     });
-    setFormValues({
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      role: "",
-      mobileNumber: "",
-    });
     setLoading(true);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
-        body: JSON.stringify(formValues),
+        body: JSON.stringify(data),
         headers: {
           "Content-Type": "application/json",
         },
@@ -146,16 +102,6 @@ export const RegisterForm = () => {
       setError(error);
     }
   };
-
-  const handleAdmin = () => {
-    setIsAdmin((prev) => !prev);
-  };
-
-  const roleValue = [
-    { key: "Supervisor", value: "Supervisor" },
-    { key: "Project Manager", value: "Project Manager" },
-    { key: "Technical Lead", value: "Technical Lead" },
-  ];
 
   return (
     <>
@@ -237,75 +183,7 @@ export const RegisterForm = () => {
               )}
             />
           </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox onCheckedChange={handleAdmin} id="admin" />
-            <label
-              htmlFor="admin"
-              className=" text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Are you an admin
-            </label>
-          </div>
-          {isAdmin && (
-            <>
-              <div className="flex items-center space-x-2">
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <>
-                      <FormItem style={{ width: "100%" }}>
-                        <FormLabel>Role</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select a role" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Supervisor">
-                                Supervisor
-                              </SelectItem>
-                              <SelectItem value="Project Manager">
-                                Project Manager
-                              </SelectItem>
-                              <SelectItem value="Technical Lead">
-                                Technical Lead
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    </>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="mobileNumber"
-                  render={({ field }) => (
-                    <>
-                      <FormItem style={{ width: "100%" }}>
-                        <FormLabel>Mobile Number</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Enter your mobile number"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    </>
-                  )}
-                />
-              </div>
-            </>
-          )}
+
           <Button className="w-full uppercase py-6" type="submit">
             Submit
           </Button>
@@ -329,52 +207,5 @@ export const RegisterForm = () => {
         Continue with Google
       </a>
     </>
-
-    // <form onSubmit={onSubmit}>
-    //   {error && (
-    //     <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
-    //   )}
-    //   <div className="mb-6">
-    //     <input
-    //       required
-    //       type="name"
-    //       name="name"
-    //       value={formValues.name}
-    //       onChange={handleChange}
-    //       placeholder="Name"
-    //       className={`${input_style}`}
-    //     />
-    //   </div>
-    //   <div className="mb-6">
-    //     <input
-    //       required
-    //       type="email"
-    //       name="email"
-    //       value={formValues.email}
-    //       onChange={handleChange}
-    //       placeholder="Email address"
-    //       className={`${input_style}`}
-    //     />
-    //   </div>
-    //   <div className="mb-6">
-    //     <input
-    //       required
-    //       type="password"
-    //       name="password"
-    //       value={formValues.password}
-    //       onChange={handleChange}
-    //       placeholder="Password"
-    //       className={`${input_style}`}
-    //     />
-    //   </div>
-    //   <button
-    //     type="submit"
-    //     style={{ backgroundColor: `${loading ? "#ccc" : "#3446eb"}` }}
-    //     className="inline-block px-7 py-4 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out w-full"
-    //     disabled={loading}
-    //   >
-    //     {loading ? "loading..." : "Sign Up"}
-    //   </button>
-    // </form>
   );
 };

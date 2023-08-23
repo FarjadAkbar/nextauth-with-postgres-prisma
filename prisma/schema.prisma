@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id         Int      @id @default(autoincrement())
-  name       String
+  username   String
   email      String   @unique
   password   String   @db.VarChar(255)
   role       Role     @default(USER)
@@ -18,11 +18,10 @@ model User {
 }
 
 model Profile {
-  id        Int    @id @default(autoincrement())
-  firstName String
-  lastName  String
-  userId    Int    @unique
-  user      User   @relation(fields: [userId], references: [id])
+  id           Int    @id @default(autoincrement())
+  mobileNumber String
+  userId       Int    @unique
+  user         User   @relation(fields: [userId], references: [id])
 }
 
 enum Role {
