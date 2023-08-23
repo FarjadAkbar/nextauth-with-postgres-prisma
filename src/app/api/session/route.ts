@@ -10,8 +10,8 @@ export async function GET(request: Request) {
       { status: 401 }
     );
   } else{
-    const isVerified = session?.user?.isVerified;
-    if (isVerified) {
+    const user = session?.user;
+    if (!user) {
       return NextResponse.json({
         authenticated: !!session,
         session,
