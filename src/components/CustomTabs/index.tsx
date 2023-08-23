@@ -1,16 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signIn } from "next-auth/react";
@@ -20,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Image from "next/image";
 import { useCallback, useState } from "react";
+import LoginForm from "../loginForm";
 
 const schema = z.object({
   email: z
@@ -68,7 +59,7 @@ export function CustomTabs() {
           const errorMessage = error.message;
           toast({
             description: `${errorMessage} ${errorCode}`,
-          })
+          });
         }
       }
       // console.log(resp, "resp");
@@ -92,47 +83,11 @@ export function CustomTabs() {
       </TabsList>
       <TabsContent value="email">
         <Card>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <CardContent className="space-y-2 pt-6 pb-0">
-              <Controller
-                name="email"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <div className="space-y-1">
-                    <Label htmlFor="email">Email</Label>
-                    <Input {...field} id="email" />
-                    {errors.email && (
-                      <span className="text-red-500">
-                        {String(errors.email.message)}
-                      </span>
-                    )}
-                  </div>
-                )}
-              />
-
-              <Controller
-                name="password"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <div className="space-y-1">
-                    <Label htmlFor="password">Password</Label>
-                    <Input {...field} id="password" type="password" />
-                    {errors.password && (
-                      <span className="text-red-500">
-                        {String(errors.password.message)}
-                      </span>
-                    )}
-                  </div>
-                )}
-              />
-
-              <CardFooter className="p-0 pt-6">
-                <Button type="submit">Login</Button>
-              </CardFooter>
-            </CardContent>
-          </form>
+          <LoginForm
+            control={control}
+            errors={errors}
+            handleSubmit={handleSubmit(onSubmit)}
+          />
           <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
             <p className="text-center font-semibold mx-4 mb-0">OR</p>
           </div>
@@ -158,47 +113,11 @@ export function CustomTabs() {
       </TabsContent>
       <TabsContent value="password">
         <Card>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <CardContent className="space-y-2 pt-6">
-              <Controller
-                name="email"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <div className="space-y-1">
-                    <Label htmlFor="email">Email</Label>
-                    <Input {...field} id="email" />
-                    {errors.email && (
-                      <span className="text-red-500">
-                        {String(errors.email.message)}
-                      </span>
-                    )}
-                  </div>
-                )}
-              />
-
-              <Controller
-                name="password"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <div className="space-y-1">
-                    <Label htmlFor="password">Password</Label>
-                    <Input {...field} id="password" type="password" />
-                    {errors.password && (
-                      <span className="text-red-500">
-                        {String(errors.password.message)}
-                      </span>
-                    )}
-                  </div>
-                )}
-              />
-
-              <CardFooter className="p-0 pt-6">
-                <Button type="submit">Login</Button>
-              </CardFooter>
-            </CardContent>
-          </form>
+          <LoginForm
+            control={control}
+            errors={errors}
+            handleSubmit={handleSubmit(onSubmit)}
+          />
         </Card>
       </TabsContent>
     </Tabs>

@@ -97,7 +97,7 @@ export const RegisterForm = () => {
         },
       });
 
-      console.log(u);
+      // console.log(u);
       // setLoading(false);
       // if (!res.ok) {
       //   setError((await res.json()).message);
