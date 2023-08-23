@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { compare } from "bcryptjs";
-import type { NextAuthOptions } from "next-auth";
+import { compare, hash } from "bcryptjs";
+import type { Account, Profile, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -22,16 +22,12 @@ export const authOptions: NextAuthOptions = {
         });
         
         if(!user){
-          const res = await fetch("/api/register", {
-            method: "POST",
-            body: JSON.stringify({
+          const hashed_password = await hash(profile.azp, 12);
+          const res = await prisma.user.create({
+            data: {
               username: profile.name,
-              email: profile.email,
-              role: profile.role,
-              isVerified: 0
-            }),
-            headers: {
-              "Content-Type": "application/json",
+                    email: profile.email,
+                    password: hashed_password,
             },
           });
         }
@@ -40,7 +36,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: profile.id.toString(), // Convert the id to a string
+          id: profile.id, // Convert the id to a string
           email: profile.email,
           username: profile.name,
           randomKey: "Hey cool",
@@ -95,6 +91,14 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
+    async signIn({ account, profile }: { account: Account | null; profile?: Profile }): Promise<string | boolean> {
+      if (account?.provider === "google") {
+        console.log(profile, "profile");
+        return profile?.email && profile?.email.endsWith("@example.com") ? true : "Email verification failed";
+      }
+      return true; // Do different verification for other providers that don't have `email_verified`
+    },
+
     jwt: ({token, user}) => {
       if (user) {
         const u = user as unknown as any;
