@@ -1,25 +1,34 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { useEffect } from "react";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type Payment = {
-  id: string;
-  status: string;
-  approved?: boolean;
+  id: number;
+  role: string;
+  isVerfied?: boolean;
   username: string;
   email: string;
-  rejected?: boolean;
 };
-function handleApprove(id: string) {
-  alert(`Row ${id} has been approved.`);
-}
-function handleRejected(id: string) {
-  alert(`Row ${id} has been rejected.`);
-}
+
+const handleApproved = (id: number) => {
+  console.log("Clicked row with ID:", id);
+  alert(id)
+};
+
+
 export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "id",
@@ -32,11 +41,11 @@ export const columns: ColumnDef<Payment>[] = [
           {`ID's`}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "role",
     header: "Status",
   },
   {
@@ -45,7 +54,17 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "email",
-    header: "Email"
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "action",
@@ -53,25 +72,24 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <>
         <div>
-          {row.original.approved ? (
+          {row.original.isVerfied ? (
             "Approved"
           ) : (
-            <Button
-              className="bg-green-500 mr-2"
-              onClick={() => handleApprove(row.original.id)}
-            >
-              Approved
-            </Button>
-          )}
-          {row.original.rejected ? (
-            "Rejected"
-          ) : (
-            <Button
-              variant="destructive"
-              onClick={() => handleRejected(row.original.id)}
-            >
-              Rejected
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-green-500"
+                onClick={() => handleApproved(row.original.id)}>Approved</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="mb-5">Confirm!</DialogTitle>
+                  <DialogDescription>
+                    <Button className="bg-green-500" >Yes</Button> 
+                    <Button className="bg-red-500">No</Button>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
       </>
