@@ -14,35 +14,45 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      async profile(profile) {
-        const user = await prisma.user.findUnique({
-          where: {
-            email: profile.email,
-          },
-        });
-        
-        if(!user){
-          const hashed_password = await hash(profile.azp, 12);
-          const res = await prisma.user.create({
-            data: {
-              username: profile.name,
-                    email: profile.email,
-                    password: hashed_password,
+      async profile(profile, tokens) {
+        try {      
+          // Find the user in the database by email
+          const user = await prisma.user.findUnique({
+            where: {
+              email: profile.email,
             },
           });
+      
+          let id = user?.id;
+      
+          if (!user) {
+            // Create a new user if not found
+            const hashed_password = await hash(profile.azp, 12);
+            const res = await prisma.user.create({
+              data: {
+                username: profile.name,
+                email: profile.email,
+                password: hashed_password,
+              },
+            });
+            id = res?.id;
+          }
+      
+          // Return the user object with the correct type
+          return {
+            id: id ? id.toString() : '',
+            email: profile.email,
+            username: profile.name,
+            randomKey: "Hey cool",
+          };
+        } catch (error) {
+          // Handle any errors that occur during profile processing
+          console.error("Error processing Google profile:", error);
+          throw error;
         }
-        if (user && user.isVerified === false) {
-          throw new Error("Admin not verified this account");
-        }
-
-        return {
-          id: profile.id, // Convert the id to a string
-          email: profile.email,
-          username: profile.name,
-          randomKey: "Hey cool",
-        };
       }
     }),
+    
     CredentialsProvider({
       name: "Sign in",
       credentials: {
@@ -93,7 +103,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ account, profile }: { account: Account | null; profile?: Profile }): Promise<string | boolean> {
       if (account?.provider === "google") {
-        console.log(profile, "profile");
         return profile?.email && profile?.email.endsWith("@example.com") ? true : "Email verification failed";
       }
       return true; // Do different verification for other providers that don't have `email_verified`
