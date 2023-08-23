@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -25,9 +25,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
+// import { toast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 const FormSchema = z
   .object({
@@ -49,7 +50,8 @@ const FormSchema = z
     message: "Password don't match",
   });
 
-export const RegisterForm = () => {
+export const RegisterForm = (props: any) => {
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/profile";
   const [loading, setLoading] = useState(false);
@@ -58,7 +60,7 @@ export const RegisterForm = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    isVerified: 0
+    isVerified: 0,
   });
   const [error, setError] = useState("");
 
@@ -68,16 +70,26 @@ export const RegisterForm = () => {
   };
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    // toast({
+    //   title: "You submitted the following values:",
+    //   description: (
+    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+    //     </pre>
+    //   ),
+    // });
     toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+      title: "Great! ",
+      description: "You are registered successfully!",
     });
     setLoading(true);
     try {
@@ -90,8 +102,15 @@ export const RegisterForm = () => {
       });
 
       setLoading(false);
+      console.log(res, "res");
+
       if (!res.ok) {
         setError((await res.json()).message);
+        toast({
+          title: "Error! ",
+          description: res?.statusText,
+          variant: "destructive",
+        });
         return;
       }
 

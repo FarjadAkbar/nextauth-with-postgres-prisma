@@ -11,8 +11,9 @@
     "db:generate": "npx prisma generate",
     "db:seeder": "ts-node prisma/seeder.ts",
     "db:deploy": "npx prisma migrate deploy",
-    "db:reset": "npx prisma migrate reset",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -42,6 +43,7 @@
     "lucide-react": "^0.268.0",
     "next": "^13.4.10",
     "next-auth": "0.0.0-pr.6777.c5550344",
+    "notistack": "^3.0.1",
     "postcss": "^8.4.26",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -55,8 +57,18 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "7.3.2",
+    "@storybook/addon-interactions": "7.3.2",
+    "@storybook/addon-links": "7.3.2",
+    "@storybook/addon-onboarding": "1.0.8",
+    "@storybook/blocks": "7.3.2",
+    "@storybook/nextjs": "7.3.2",
+    "@storybook/react": "7.3.2",
+    "@storybook/testing-library": "0.2.0",
     "@types/bcryptjs": "^2.4.2",
+    "eslint-plugin-storybook": "^0.6.13",
     "prisma": "^5.1.1",
+    "storybook": "7.3.2",
     "ts-node": "^10.9.1"
   },
   "main": "index.js",
