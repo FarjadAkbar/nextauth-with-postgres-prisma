@@ -1,5 +1,6 @@
 import "./globals.css";
 import { NextAuthProvider } from "./providers";
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata = {
   title: "Next Auth with Prisma",
@@ -15,6 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <NextAuthProvider>{children}</NextAuthProvider>
+        <Toaster />
       </body>
     </html>
   );
