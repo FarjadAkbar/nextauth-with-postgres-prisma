@@ -17,11 +17,6 @@ const Header = () => {
   const { data: session } = useSession();
   const user = session?.user as User;
   
-  useEffect(() => {
-    if (session) {
-      router.push('/profile'); // Redirect to profile if already logged in
-    }
-  }, [session, router]);
 
   const handleLogout = async () => {
     await signOut();
