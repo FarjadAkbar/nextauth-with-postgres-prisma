@@ -2,21 +2,20 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type User = {
   id: string;
   email: string;
   username: string;
   randomKey: string;
-  role: string; // Make sure to match the actual type of the role property
+  role: string;
 };
 
 const Header = () => {
+  const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user as User;
-  const userRole = user?.role; // Get the user's role
-
-  console.log(user);
 
   return (
     <header className="bg-white h-20">
@@ -46,16 +45,29 @@ const Header = () => {
               </li>
             </>
           )}
+          {user?.role === "ADMIN" && (
+            <>
+              <li>
+                <Link href="/admin" className="text-ct-dark-600">
+                  Admin
+                </Link>
+              </li>
+            </>
+          )}
           {user && (
             <>
-              {userRole === "ADMIN" && (
-                <li>
-                  <Link href="/profile" className="text-ct-dark-600">
-                    Profile
-                  </Link>
-                </li>
-              )}
-              <li className="cursor-pointer" onClick={() => signOut()}>
+              <li>
+                <Link href="/profile" className="text-ct-dark-600">
+                  Profile
+                </Link>
+              </li>
+              <li
+                className="cursor-pointer"
+                onClick={() => {
+                  signOut();
+                  router.push("/login");
+                }}
+              >
                 Logout
               </li>
             </>

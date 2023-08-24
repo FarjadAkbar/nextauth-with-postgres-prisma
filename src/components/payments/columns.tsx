@@ -1,34 +1,46 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { useEffect } from "react";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 export type Payment = {
   id: number;
   role: string;
-  isVerfied?: boolean;
+  isVerified?: boolean;
   username: string;
   email: string;
 };
 
-const handleApproved = (id: number) => {
-  console.log("Clicked row with ID:", id);
-  alert(id)
+async function handleApprovedYes(rowId: number) {
+  const res = await fetch(`/api/users/${rowId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    alert("User Approved");
+  }
+  if (!res.ok) {
+    alert("User Not Approved");
+    throw new Error("Fetch failed");
+  }
+}
+const rowHanlde = (row: any) => {
+  console.log(row, "row");
 };
-
-
 export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "id",
@@ -72,25 +84,35 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <>
         <div>
-          {row.original.isVerfied ? (
-            "Approved"
-          ) : (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-green-500"
-                onClick={() => handleApproved(row.original.id)}>Approved</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle className="mb-5">Confirm!</DialogTitle>
-                  <DialogDescription>
-                    <Button className="bg-green-500" >Yes</Button> 
-                    <Button className="bg-red-500">No</Button>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-          )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              {row.original.isVerified ? (
+                <Button className="bg-green-500" disabled>
+                  Approve
+                </Button>
+              ) : (
+                <Button className="bg-green-500" onClick={() => rowHanlde(row)}>
+                  Approve
+                </Button>
+              )}
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undo.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>No</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleApprovedYes(row.original.id)}
+                >
+                  Yes
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </>
     ),

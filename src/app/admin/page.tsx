@@ -1,8 +1,9 @@
+'use client'
 import Header from "@/components/header.component";
 import AdminPage from "@/components/payments/page";
 import React from "react";
 
-export default function page() {
+export default function Admin() {
   return (
     <>
       <Header />
