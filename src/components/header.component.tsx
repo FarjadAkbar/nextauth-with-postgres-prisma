@@ -6,7 +6,10 @@ import Link from "next/link";
 const Header = () => {
   const { data: session } = useSession();
   const user = session?.user;
+  const userRole = user?.role; // Get the user's role
 
+  console.log(user);
+  
   return (
     <header className="bg-white h-20">
       <nav className="h-full flex justify-between container items-center">
@@ -37,11 +40,13 @@ const Header = () => {
           )}
           {user && (
             <>
-              <li>
-                <Link href="/profile" className="text-ct-dark-600">
-                  Profile
-                </Link>
-              </li>
+              {userRole === "ADMIN" && (
+                <li>
+                  <Link href="/profile" className="text-ct-dark-600">
+                    Profile
+                  </Link>
+                </li>
+              )}
               <li className="cursor-pointer" onClick={() => signOut()}>
                 Logout
               </li>

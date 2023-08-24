@@ -89,10 +89,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id.toString(), // Convert the id to a string
+          id: user.id.toString(),
           email: user.email,
           username: user.username,
           randomKey: "Hey cool",
+          role: user.role, // Include the user's role here
         };
       }
     }),
@@ -108,26 +109,28 @@ export const authOptions: NextAuthOptions = {
       return true; // Do different verification for other providers that don't have `email_verified`
     },
 
-    jwt: ({token, user}) => {
+    jwt: ({ token, user }) => {
       if (user) {
         const u = user as unknown as any;
         return {
           ...token,
           id: u.id,
           randomKey: u.randomKey,
+          role: u.role, // Include the user's role in the token
         };
       }
       return token;
     },
 
-    session: ({session, token}) => {
+    session: ({ session, token }) => {
       return {
         ...session,
         user: {
           ...session.user,
           id: token.id,
           randomKey: token.randomKey,
-        },  
+          role: token.role, // Include the user's role in the session
+        },
       };
     },
   },
