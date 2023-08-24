@@ -12,7 +12,7 @@ interface UserExistData {
 }
 
 async function getUserIfExists(email: string, password: string): Promise<UserExistData | null> {
-  const userExist = await prisma.user.findFirst({
+  const userExist = await prisma.user.findUnique({
     where: {
       email: email,
       },

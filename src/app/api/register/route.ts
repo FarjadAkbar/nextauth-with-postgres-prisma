@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       return validationError;
     }
 
-    const userExist = await prisma.user.findFirst({
+    const userExist = await prisma.user.findUnique({
       where: {
         email: email,
       },

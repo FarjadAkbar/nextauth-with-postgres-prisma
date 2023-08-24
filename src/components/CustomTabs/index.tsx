@@ -1,11 +1,10 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Image from "next/image";
@@ -28,7 +27,6 @@ export function CustomTabs() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/profile";
-  const { toast } = useToast();
 
   const onSubmit = useCallback(
     async (data: any) => {
@@ -43,28 +41,19 @@ export function CustomTabs() {
         setLoading(true);
         if (!resp?.ok) {
           setLoading(false);
-          throw new Error("Request failed");
         }
         if (!resp.error) {
           setLoading(true);
           router.push("/");
-          toast({
-            description: "Sign In Successfully",
-          });
-          // localStorage.setItem(TOKEN, resp?.data.token);
+          alert("Sign In Successfully");
+        } else {
+          alert(`An error occurred during login. ${resp.error}`);
         }
       } catch (error: any) {
-        if (resp.error) {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          toast({
-            description: `${errorMessage} ${errorCode}`,
-          });
+        if (resp?.error) {
         }
       }
-      // console.log(resp, "resp");
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [loading, router]
   );
 

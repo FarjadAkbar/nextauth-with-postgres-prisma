@@ -1,3 +1,4 @@
+"use client"
 import { CustomTabs } from "@/components/CustomTabs";
 import Header from "@/components/header.component";
 

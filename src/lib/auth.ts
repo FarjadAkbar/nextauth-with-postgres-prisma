@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
       async profile(profile, tokens) {
         try {      
           // Find the user in the database by email
-          const user = await prisma.user.findFirst({
+          const user = await prisma.user.findUnique({
             where: {
               email: profile.email,
             },
@@ -72,7 +72,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Password is required");
         }
       
-        const user = await prisma.user.findFirst({
+        const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
           },
