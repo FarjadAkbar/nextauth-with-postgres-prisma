@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { compare } from "bcryptjs";
-import type { NextAuthOptions } from "next-auth";
+import { compare, hash } from "bcryptjs";
+import type { Account, Profile, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -14,39 +14,45 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      async profile(profile) {
-        const user = await prisma.user.findUnique({
-          where: {
-            email: profile.email,
-          },
-        });
-        
-        if(!user){
-          const res = await fetch("/api/register", {
-            method: "POST",
-            body: JSON.stringify({
-              username: profile.name,
+      async profile(profile, tokens) {
+        try {      
+          // Find the user in the database by email
+          const user = await prisma.user.findFirst({
+            where: {
               email: profile.email,
-              role: profile.role,
-              isVerified: 0
-            }),
-            headers: {
-              "Content-Type": "application/json",
             },
           });
+      
+          let id = user?.id;
+      
+          if (!user) {
+            // Create a new user if not found
+            const hashed_password = await hash(profile.azp, 12);
+            const res = await prisma.user.create({
+              data: {
+                username: profile.name,
+                email: profile.email,
+                password: hashed_password,
+              },
+            });
+            id = res?.id;
+          }
+      
+          // Return the user object with the correct type
+          return {
+            id: id ? id.toString() : '',
+            email: profile.email,
+            username: profile.name,
+            randomKey: "Hey cool",
+          };
+        } catch (error) {
+          // Handle any errors that occur during profile processing
+          console.error("Error processing Google profile:", error);
+          throw error;
         }
-        if (user && user.isVerified === false) {
-          throw new Error("Admin not verified this account");
-        }
-
-        return {
-          id: profile.id.toString(), // Convert the id to a string
-          email: profile.email,
-          username: profile.name,
-          randomKey: "Hey cool",
-        };
       }
     }),
+    
     CredentialsProvider({
       name: "Sign in",
       credentials: {
@@ -66,7 +72,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Password is required");
         }
       
-        const user = await prisma.user.findUnique({
+        const user = await prisma.user.findFirst({
           where: {
             email: credentials.email,
           },
@@ -95,6 +101,13 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
+    async signIn({ account, profile }: { account: Account | null; profile?: Profile }): Promise<string | boolean> {
+      if (account?.provider === "google") {
+        return profile?.email && profile?.email.endsWith("@example.com") ? true : "Email verification failed";
+      }
+      return true; // Do different verification for other providers that don't have `email_verified`
+    },
+
     jwt: ({token, user}) => {
       if (user) {
         const u = user as unknown as any;
