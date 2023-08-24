@@ -1,35 +1,23 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { ChangeEvent, useEffect, useState } from "react";
-
+import { ChangeEvent, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-// import { toast } from "@/components/ui/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
-import { prisma } from "@/lib/prisma";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z
   .object({
@@ -51,8 +39,8 @@ const FormSchema = z
     message: "Password don't match",
   });
 
-export const RegisterForm = (props: any) => {
-  const { toast } = useToast();
+export const RegisterForm = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/profile";
   const [loading, setLoading] = useState(false);
@@ -101,22 +89,12 @@ export const RegisterForm = (props: any) => {
           "Content-Type": "application/json",
         },
       });
-
-      const u = await fetch("/api/users", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      // console.log(u);
-      // setLoading(false);
-      // if (!res.ok) {
-      //   setError((await res.json()).message);
-      //   return;
-      // }
-
-      // signIn(undefined, { callbackUrl: "/" });
+      if (res?.ok) {
+        alert("Sign Up Successfully");
+        router?.push("/login");
+      } else {
+        alert(`An error occurred during Sign Up.`);
+      }
     } catch (error: any) {
       setLoading(false);
       setError(error);

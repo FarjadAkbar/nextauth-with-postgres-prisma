@@ -13,6 +13,8 @@ interface HeaderProps {
   onLogin: () => void;
   onLogout: () => void;
   onCreateAccount: () => void;
+  onProfile?: () => void;
+  onAdmin?: () => void;
 }
 
 export const Header = ({
@@ -21,6 +23,8 @@ export const Header = ({
   onLogin,
   onLogout,
   onCreateAccount,
+  onProfile,
+  onAdmin,
 }: HeaderProps) => (
   <header>
     <div className="storybook-header">
@@ -28,9 +32,20 @@ export const Header = ({
         <h1>NextJS App</h1>
       </div>
       <div>
-        <Button size="small" onClick={onHomeClick} label="Home" />
-        <Button size="small" onClick={onLogin} label="Login" />
-        <Button size="small" onClick={onCreateAccount} label="Register" />
+        {user ? (
+          <>
+            <Button size="small" onClick={onHomeClick} label="Home" />
+            <Button size="small" onClick={onProfile} label="Profile" />
+            <Button size="small" onClick={onAdmin} label="Admin" />
+            <Button size="small" onClick={onLogout} label="Logout" />
+          </>
+        ) : (
+          <>
+            <Button size="small" onClick={onHomeClick} label="Home" />
+            <Button size="small" onClick={onLogin} label="Login" />
+            <Button size="small" onClick={onCreateAccount} label="Register" />
+          </>
+        )}
       </div>
     </div>
   </header>

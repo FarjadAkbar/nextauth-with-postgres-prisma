@@ -2,10 +2,20 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  randomKey: string;
+  role: string;
+};
 
 const Header = () => {
+  const router = useRouter();
   const { data: session } = useSession();
-  const user = session?.user;
+  const user = session?.user as User;
 
   return (
     <header className="bg-white h-20">
@@ -35,6 +45,15 @@ const Header = () => {
               </li>
             </>
           )}
+          {user?.role === "ADMIN" && (
+            <>
+              <li>
+                <Link href="/admin" className="text-ct-dark-600">
+                  Admin
+                </Link>
+              </li>
+            </>
+          )}
           {user && (
             <>
               <li>
@@ -42,7 +61,13 @@ const Header = () => {
                   Profile
                 </Link>
               </li>
-              <li className="cursor-pointer" onClick={() => signOut()}>
+              <li
+                className="cursor-pointer"
+                onClick={() => {
+                  signOut();
+                  router.push("/login");
+                }}
+              >
                 Logout
               </li>
             </>
