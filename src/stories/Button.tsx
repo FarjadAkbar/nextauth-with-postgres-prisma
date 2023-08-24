@@ -11,6 +11,18 @@ interface ButtonProps {
    */
   backgroundColor?: string;
   /**
+   * What color to use
+   */
+  color?: string;
+  /**
+   * What padding to use
+   */
+  padding?: string;
+  /**
+   * What text transform to use
+   */
+  upper?: string;
+  /**
    * How large should the button be?
    */
   size?: "small" | "medium" | "large";
@@ -31,6 +43,9 @@ export const Button = ({
   primary = false,
   size = "medium",
   backgroundColor,
+  color,
+  upper,
+  padding,
   label,
   ...props
 }: ButtonProps) => {
@@ -48,7 +63,11 @@ export const Button = ({
       {label}
       <style jsx>{`
         button {
+          color: ${color};
+          padding: ${padding};
+          text-transform: ${upper};
           box-shadow: none;
+          border-radius: 0px;
           background-color: ${backgroundColor};
         }
       `}</style>

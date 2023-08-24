@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { within, userEvent } from "@storybook/testing-library";
 
-import { RegisterForm } from "./RegisterForm";
+import { LoginForm } from "./LoginForm";
 
 const meta = {
-  title: "Register Form",
-  component: RegisterForm,
+  title: "Login Form",
+  component: LoginForm,
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/react/configure/story-layout
     layout: "fullscreen",
   },
-} satisfies Meta<typeof RegisterForm>;
+} satisfies Meta<typeof LoginForm>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -33,15 +33,6 @@ export const Validated: Story = {
   },
 };
 
-export const PasswordIssue: Story = {
-  args: {
-    onEmptyClick: true,
-    onPasswordDontMatch: true,
-    onError: false,
-    onSuccess: false,
-  },
-};
-
 export const Error: Story = {
   args: {
     onEmptyClick: false,
@@ -58,6 +49,6 @@ export const Success: Story = {
     onPasswordDontMatch: false,
     onFullClick: true,
     onError: true,
-    message: "Successfully signed up!",
+    message: "Successfully logged in!",
   },
 };

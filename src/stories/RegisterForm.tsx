@@ -1,271 +1,228 @@
-// import React from "react";
-
-// import { Header } from "./Header";
-// import "./page.css";
-
-// type User = {
-//   name: string;
-// };
-
-// export const RegisterForm: React.FC = () => {
-//   const [user, setUser] = React.useState<User>();
-
-//   return (
-//     <article>
-//       <Header
-//         user={user}
-//         onLogin={() => setUser({ name: "Jane Doe" })}
-//         onLogout={() => setUser(undefined)}
-//         onCreateAccount={() => setUser({ name: "Jane Doe" })}
-//         onHomeClick={() => setUser({ name: "Jane Doe" })}
-//       />
-
-//       <section className="storybook-page">
-//         <h2>Pages in Storybook</h2>
-//         <p>
-//           We recommend building UIs with a{" "}
-//           <a
-//             href="https://componentdriven.org"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             <strong>component-driven</strong>
-//           </a>{" "}
-//           process starting with atomic components and ending with pages.
-//         </p>
-//         <p>
-//           Render pages with mock data. This makes it easy to build and review
-//           page states without needing to navigate to them in your app. Here are
-//           some handy patterns for managing page data in Storybook:
-//         </p>
-//         <ul>
-//           <li>
-//             Use a higher-level connected component. Storybook helps you compose
-//             such data from the "args" of child component stories
-//           </li>
-//           <li>
-//             Assemble data in the page component from your services. You can mock
-//             these services out using Storybook.
-//           </li>
-//         </ul>
-//         <p>
-//           Get a guided tutorial on component-driven development at{" "}
-//           <a
-//             href="https://storybook.js.org/tutorials/"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             Storybook tutorials
-//           </a>
-//           . Read more in the{" "}
-//           <a
-//             href="https://storybook.js.org/docs"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             docs
-//           </a>
-//           .
-//         </p>
-//         <div className="tip-wrapper">
-//           <span className="tip">Tip</span> Adjust the width of the canvas with
-//           the{" "}
-//           <svg
-//             width="10"
-//             height="10"
-//             viewBox="0 0 12 12"
-//             xmlns="http://www.w3.org/2000/svg"
-//           >
-//             <g fill="none" fillRule="evenodd">
-//               <path
-//                 d="M1.5 5.2h4.8c.3 0 .5.2.5.4v5.1c-.1.2-.3.3-.4.3H1.4a.5.5 0 01-.5-.4V5.7c0-.3.2-.5.5-.5zm0-2.1h6.9c.3 0 .5.2.5.4v7a.5.5 0 01-1 0V4H1.5a.5.5 0 010-1zm0-2.1h9c.3 0 .5.2.5.4v9.1a.5.5 0 01-1 0V2H1.5a.5.5 0 010-1zm4.3 5.2H2V10h3.8V6.2z"
-//                 id="a"
-//                 fill="#999"
-//               />
-//             </g>
-//           </svg>
-//           Viewports addon in the toolbar
-//         </div>
-//       </section>
-//     </article>
-//   );
-// };
-
+import React from "react";
 import { Button } from "./Button";
+import { Header } from "./Header";
 
-export const RegisterForm = () => {
+interface RegisterProps {
+  message?: string;
+  onEmptyClick?: boolean;
+  onPasswordDontMatch?: boolean;
+  onFullClick?: boolean;
+  onError?: boolean;
+  onSuccess?: boolean;
+}
+type User = {
+  name: string;
+};
+
+export const RegisterForm = ({
+  message,
+  onEmptyClick,
+  onPasswordDontMatch,
+  onFullClick,
+  onError,
+  onSuccess,
+}: RegisterProps) => {
+  const [user, setUser] = React.useState<User>();
+  const [showError, setShowError] = React.useState(false);
+  const [showPasswordError, setShowPasswordError] = React.useState(false);
+  const [showToast, setShowToast] = React.useState(false);
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [showToast]);
+  const handleSubmit = () => {
+    onEmptyClick && setShowError(true);
+    onEmptyClick && onPasswordDontMatch && setShowPasswordError(true);
+    onError && setShowToast(true);
+    onSuccess && setShowToast(true);
+  };
   return (
     <>
-      <form>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "20px",
-            gap: "20px",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              placeholder="Enter your username"
-            />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="emailAddress">Email Address</label>
-            <input
-              id="emailAddress"
-              type="email"
-              placeholder="Enter your email address"
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "20px",
-            gap: "20px",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-            />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              placeholder="Enter your password again"
-            />
-          </div>
-          {/* <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <>
-                  <FormItem style={{ width: "100%" }}>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your username" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <>
-                  <FormItem style={{ width: "100%" }}>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email address"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </>
-              )}
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <>
-                  <FormItem style={{ width: "100%" }}>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter your password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <>
-                  <FormItem style={{ width: "100%" }}>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter your password again"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </>
-              )}
-            /> */}
-        </div>
-        <div
-          style={{
-            //   background: "#000",
-            textAlign: "center",
-            textTransform: "uppercase",
-            color: "white",
-          }}
-        >
-          <Button label="Submit" />
-        </div>
-      </form>
+      <Header
+        user={user}
+        onLogin={() => setUser({ name: "Jane Doe" })}
+        onLogout={() => setUser(undefined)}
+        onCreateAccount={() => setUser({ name: "Jane Doe" })}
+        onHomeClick={() => setUser({ name: "Jane Doe" })}
+      />
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
-        <hr style={{ position: "absolute", width: "22%", left: "25%" }} />
-        <p style={{ textAlign: "center", fontWeight: "600", margin: "15px" }}>
-          OR
-        </p>
-        <hr style={{ position: "absolute", width: "20%", left: "53%" }} />
-      </div>
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <a
-          className="px-7 py-2 mt-2 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out w-full flex justify-center items-center mb-3"
+        <h1>Register</h1>
+        <form>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "20px",
+              gap: "20px",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                style={{ color: showError ? "red" : "black" }}
+                htmlFor="username"
+              >
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+              />
+              {showError && (
+                <p style={{ color: "red", marginBottom: "0" }}>
+                  Username must be at least 2 characters.
+                </p>
+              )}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                style={{ color: showError ? "red" : "black" }}
+                htmlFor="emailAddress"
+              >
+                Email Address
+              </label>
+              <input
+                id="emailAddress"
+                type="email"
+                placeholder="Enter your email address"
+              />
+              {showError && (
+                <p style={{ color: "red", marginBottom: "0" }}>
+                  Email must be a valid email address.
+                </p>
+              )}
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "20px",
+              gap: "20px",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                style={{ color: showError ? "red" : "black" }}
+                htmlFor="password"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+              />
+              {showError && (
+                <p style={{ color: "red", marginBottom: "0" }}>
+                  Password must be at least 6 characters
+                </p>
+              )}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                style={{ color: showError ? "red" : "black" }}
+                htmlFor="confirmPassword"
+              >
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="Enter your password again"
+              />
+              {showError && !showPasswordError && (
+                <p style={{ color: "red", marginBottom: "0" }}>
+                  Please re-enter password correctly
+                </p>
+              )}
+              {showPasswordError && showPasswordError && (
+                <p style={{ color: "red", marginBottom: "0" }}>
+                  Password don't match
+                </p>
+              )}
+            </div>
+          </div>
+          <div
+            style={{
+              textAlign: "center",
+              margin: "20px 0",
+            }}
+          >
+            <Button
+              onClick={handleSubmit}
+              label="Submit"
+              backgroundColor="black"
+              color="white"
+              padding="15px 24%"
+              upper="uppercase"
+              // style={{ background: "#000", color: "#fff", padding: "15px 7%" }}
+            />
+            <div
+              style={{
+                display: showToast ? "block" : "none",
+                position: "absolute",
+                left: "40%",
+                top: "14%",
+                boxShadow: "0px 3px 6px rgba(0,0,0,0.3)",
+                padding: "15px 20px",
+              }}
+              className="toast"
+            >
+              <div className="toast-content">
+                <span>{message}</span>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div
           style={{
-            backgroundColor: "#000",
-            padding: "20px",
-            marginTop: "10px",
-            color: "white",
-            textTransform: "uppercase",
-            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
-          role="button"
         >
-          <img
-            className="pr-2"
-            src="/images/google.svg"
-            alt=""
-            style={{ height: "2rem" }}
-          />
-          Continue with Google
-        </a>
+          <hr style={{ position: "absolute", width: "14%", left: "34%" }} />
+          <p style={{ textAlign: "center", fontWeight: "600", margin: "15px" }}>
+            OR
+          </p>
+          <hr style={{ position: "absolute", width: "14%", left: "52%" }} />
+        </div>
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <a
+            style={{
+              backgroundColor: "#000",
+              padding: "20px",
+              marginTop: "10px",
+              color: "white",
+              textTransform: "uppercase",
+              textAlign: "center",
+            }}
+            role="button"
+          >
+            <img
+              className="pr-2"
+              src="/images/google.svg"
+              alt=""
+              style={{ height: "2rem" }}
+            />
+            Continue with Google
+          </a>
+        </div>
       </div>
     </>
   );
