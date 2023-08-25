@@ -11,8 +11,9 @@
     "db:generate": "npx prisma generate",
     "db:seeder": "ts-node prisma/seed.ts",
     "db:deploy": "npx prisma migrate deploy",
-    "db:reset": "npx prisma migrate reset",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -20,7 +21,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.2.0",
     "@next-auth/prisma-adapter": "^1.0.7",
-    "@prisma/client": "^5.2.0",
+    "@prisma/client": "^5.1.1",
     "@radix-ui/react-alert-dialog": "^1.0.4",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.4",
@@ -59,8 +60,18 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "7.3.2",
+    "@storybook/addon-interactions": "7.3.2",
+    "@storybook/addon-links": "7.3.2",
+    "@storybook/addon-onboarding": "1.0.8",
+    "@storybook/blocks": "7.3.2",
+    "@storybook/nextjs": "7.3.2",
+    "@storybook/react": "7.3.2",
+    "@storybook/testing-library": "0.2.0",
     "@types/bcryptjs": "^2.4.2",
+    "eslint-plugin-storybook": "^0.6.13",
     "prisma": "^5.2.0",
+    "storybook": "7.3.2",
     "ts-node": "^10.9.1"
   },
   "main": "index.js",
