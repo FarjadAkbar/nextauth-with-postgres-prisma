@@ -1,8 +1,8 @@
-"use client"
-import { signOut, useSession } from "next-auth/react";
+"use client";
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
 
 type User = {
   id: string;
@@ -11,68 +11,112 @@ type User = {
   randomKey: string;
   role: string;
 };
-
-const Header = () => {
+export default function Header() {
+  const [navbar, setNavbar] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user as User;
-  
 
   const handleLogout = async () => {
     await signOut();
     router.push("/login");
   };
-
   return (
-    <header className="bg-white h-20">
-      <nav className="h-full flex justify-between container items-center">
-        <div>
-          <Link href="/" className="text-ct-dark-600 text-2xl font-semibold">
-            NextJS App
-          </Link>
-        </div>
-        <ul className="flex items-center gap-4">
-          <li>
-            <Link href="/" className="text-ct-dark-600">
-              Home
-            </Link>
-          </li>
-          {!user ? (
-            <>
-              <li>
-                <Link href="/login" className="text-ct-dark-600">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link href="/register" className="text-ct-dark-600">
-                  Register
-                </Link>
-              </li>
-            </>
-          ) : (
-            <>
-              {user.role === "ADMIN" && (
+    <div>
+      <nav className="w-full bg-gray-800 shadow">
+        <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
+          <div>
+            <div className="flex items-center justify-between py-3 md:py-5 md:block">
+              <a href="#">
+                <h2 className="text-2xl text-white font-bold">NEXT JS</h2>
+              </a>
+              <div className="md:hidden">
+                <button
+                  className="p-2 text-gray-700 rounded-md outline-none focus:border-gray-400 focus:border"
+                  onClick={() => setNavbar(!navbar)}
+                >
+                  {navbar ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-6 h-6 text-white"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div
+              className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${
+                navbar ? "block" : "hidden"
+              }`}
+            >
+              <ul className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
                 <li>
-                  <Link href="/admin" className="text-ct-dark-600">
-                    Admin
+                  <Link href="/" className="text-white">
+                    Home
                   </Link>
                 </li>
-              )}
-              <li>
-                <Link href="/profile" className="text-ct-dark-600">
-                  Profile
-                </Link>
-              </li>
-              <li className="cursor-pointer" onClick={handleLogout}>
-                Logout
-              </li>
-            </>
-          )}
-        </ul>
+                {!user ? (
+                  <>
+                    <li>
+                      <Link href="/login" className="text-white">
+                        Login
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/register" className="text-white">
+                        Register
+                      </Link>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    {user.role === "ADMIN" && (
+                      <li>
+                        <Link href="/admin" className="text-white">
+                          Admin
+                        </Link>
+                      </li>
+                    )}
+                    <li>
+                      <Link href="/profile" className="text-white">
+                        Profile
+                      </Link>
+                    </li>
+                    <li className="cursor-pointer text-white" onClick={handleLogout}>
+                      Logout
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
       </nav>
-    </header>
+    </div>
   );
-};
-
-export default Header;
+}

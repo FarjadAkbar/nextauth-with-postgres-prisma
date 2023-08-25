@@ -13,7 +13,7 @@ interface LoginFormProps {
 export default function LoginForm(props: LoginFormProps) {
   return (
     <form onSubmit={props.handleSubmit}>
-      <CardContent className="space-y-2 pt-6 pb-0">
+      <CardContent className="space-y-2 pt-6 pb-6">
         <Controller
           name="email"
           control={props.control}

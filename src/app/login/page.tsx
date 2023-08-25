@@ -1,18 +1,32 @@
 "use client"
 import { CustomTabs } from "@/components/CustomTabs";
 import Header from "@/components/header.component";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  return (
-    <>
-      <Header />
-      <section className="bg-ct-blue-600 min-h-screen pt-20">
-        <div className="container mx-auto px-6 py-12 h-full flex justify-center items-center">
-          <div className="md:w-8/12 lg:w-5/12 bg-white px-8 py-10">
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  {
+    if(session === null){
+      return(
+        <>
+        <Header />
+      <section className="bg-ct-blue-600 min-h-screen flex justify-center items-center">
+        <div className="flex justify-center items-center">
+          <div className="bg-white px-8 py-10">
              <CustomTabs />
           </div>
         </div>
       </section>
-    </>
-  );
+        </>
+      )
+    }else{
+      return (
+        router.push('/')
+      )
+    }
+  }
+ 
 }
