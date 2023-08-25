@@ -152,7 +152,7 @@ export const RegisterForm = ({
               )}
               {showPasswordError && showPasswordError && (
                 <p style={{ color: "red", marginBottom: "0" }}>
-                  Password don't match
+                  Password do not match
                 </p>
               )}
             </div>
