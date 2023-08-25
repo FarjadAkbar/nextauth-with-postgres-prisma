@@ -8,23 +8,18 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  username   String
-  email      String   @unique
-  password   String   @db.VarChar(255)
-  role       Role     @default(USER)
-  isVerified Boolean  @default(false)
-  profile    Profile?
-}
-
-model Profile {
-  id           Int    @id @default(autoincrement())
-  mobileNumber String
-  userId       Int    @unique
-  user         User   @relation(fields: [userId], references: [id])
+  id            Int      @id @default(autoincrement())
+  username      String
+  email         String   @unique
+  password      String   @db.VarChar(255)
+  role          Role     @default(USER)
+  isVerified    Boolean  @default(false)
+  mobileNumber  String?
 }
 
 enum Role {
   USER
   ADMIN
+  MANAGER
+  EMPLOYEE
 }

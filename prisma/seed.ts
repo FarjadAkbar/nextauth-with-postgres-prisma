@@ -13,7 +13,8 @@ async function main() {
       username: "Admin",
       password,
       isVerified: true,
-      role: "ADMIN"
+      role: "ADMIN",
+      mobileNumber: "023333"
     },
   });
   console.log({ user });

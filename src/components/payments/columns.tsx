@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "@/components/ui/use-toast";
 
 export type Payment = {
   id: number;
@@ -31,11 +32,14 @@ async function handleApprovedYes(rowId: number) {
     },
   });
   if (res.ok) {
-    alert("User Approved");
+    toast({
+      title: "Approved successfully"
+    });
   }
   if (!res.ok) {
-    alert("User Not Approved");
-    throw new Error("Fetch failed");
+    toast({
+      title: "Not approved"
+    });
   }
 }
 const rowHanlde = (row: any) => {

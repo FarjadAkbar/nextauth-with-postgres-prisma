@@ -9,15 +9,25 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { Role } from "@prisma/client";
 
 const FormSchema = z
   .object({
@@ -33,6 +43,14 @@ const FormSchema = z
     confirmPassword: z
       .string()
       .min(6, { message: "Please re-enter password correctly" }),
+    role: z.string().optional(),
+    mobileNumber: z
+      .string()
+      .min(10, { message: "Mobile number must be at least 10 characters" })
+      .max(11, {
+        message: "Mobile number must not be more than 11 characters",
+      })
+      .optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
@@ -44,14 +62,16 @@ export const RegisterForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/profile";
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [formValues, setFormValues] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    isVerified: 0,
+    isVerified: false,
+    role: "",
+    mobileNumber: "",
   });
-  const [error, setError] = useState("");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -67,6 +87,15 @@ export const RegisterForm = () => {
     },
   });
 
+  const handleAdmin = () => {
+    setIsAdmin((prev) => !prev);
+  };
+
+  const roleValue = [
+    { key: Role.ADMIN, value: Role.ADMIN },
+    { key: Role.USER, value: Role.USER },
+  ];
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     // toast({
     //   title: "You submitted the following values:",
@@ -81,6 +110,17 @@ export const RegisterForm = () => {
       description: "You are registered successfully!",
     });
     setLoading(true);
+
+    setFormValues({
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      role: "",
+      isVerified: false,
+      mobileNumber: "",
+    });
+
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -90,14 +130,23 @@ export const RegisterForm = () => {
         },
       });
       if (res?.ok) {
-        alert("Sign Up Successfully");
+        toast({
+          title: "Register successfully",
+        });
         router?.push("/login");
       } else {
-        alert(`An error occurred during Sign Up.`);
+        toast({
+          title: "Something went wrong.",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
       setLoading(false);
-      setError(error);
+      toast({
+        title: "Something went wrong.",
+        description: error,
+        variant: "destructive",
+      });
     }
   };
 
@@ -182,6 +231,73 @@ export const RegisterForm = () => {
             />
           </div>
 
+          <div className="flex items-center space-x-2">
+            <Checkbox onCheckedChange={handleAdmin} id="admin" />
+            <label
+              htmlFor="admin"
+              className=" text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Are you an admin
+            </label>
+          </div>
+          {isAdmin && (
+            <>
+              <div className="flex items-center space-x-2">
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <>
+                      <FormItem style={{ width: "100%" }}>
+                        <FormLabel>Role</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a role" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {roleValue &&
+                                roleValue.map((item) => (
+                                  <SelectItem key={item.key} value={item.key}>
+                                    {item.value}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="mobileNumber"
+                  render={({ field }) => (
+                    <>
+                      <FormItem style={{ width: "100%" }}>
+                        <FormLabel>Mobile Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Enter your mobile number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </>
+                  )}
+                />
+              </div>
+            </>
+          )}
+
           <Button className="w-full uppercase py-6" type="submit">
             Submit
           </Button>
@@ -190,20 +306,23 @@ export const RegisterForm = () => {
       <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
         <p className="text-center font-semibold mx-4 mb-0">OR</p>
       </div>
-      <a
-        className="px-7 py-2 mt-2 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out w-full flex justify-center items-center mb-3"
-        style={{ backgroundColor: "#000" }}
-        onClick={() => signIn("google", { callbackUrl })}
-        role="button"
-      >
-        <img
-          className="pr-2"
-          src="/images/google.svg"
-          alt=""
-          style={{ height: "2rem" }}
-        />
-        Continue with Google
-      </a>
+
+      {!isAdmin && (
+        <a
+          className="px-7 py-2 mt-2 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out w-full flex justify-center items-center mb-3"
+          style={{ backgroundColor: "#000" }}
+          onClick={() => signIn("google", { callbackUrl })}
+          role="button"
+        >
+          <img
+            className="pr-2"
+            src="/images/google.svg"
+            alt=""
+            style={{ height: "2rem" }}
+          />
+          Continue with Google
+        </a>
+      )}
     </>
   );
 };

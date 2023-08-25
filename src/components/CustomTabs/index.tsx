@@ -10,6 +10,7 @@ import { z } from "zod";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import LoginForm from "../loginForm";
+import { toast } from "@/components/ui/use-toast";
 
 const schema = z.object({
   email: z
@@ -44,14 +45,22 @@ export function CustomTabs() {
         }
         if (!resp.error) {
           setLoading(true);
+          toast({
+            title: "Sign in successfully."
+          });
           router.push("/");
-          alert("Sign In Successfully");
         } else {
-          alert(`An error occurred during login. ${resp.error}`);
+          toast({
+            title: `${resp.error}`,
+            variant: "destructive",
+          });
         }
       } catch (error: any) {
-        if (resp?.error) {
-        }
+        toast({
+          title: "Something went wrong",
+          description: error,
+          variant: "destructive",
+        });
       }
     },
     [loading, router]

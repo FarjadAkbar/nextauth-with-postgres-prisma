@@ -1,8 +1,8 @@
-"use client";
-
+"use client"
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 type User = {
   id: string;
@@ -16,6 +16,12 @@ const Header = () => {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user as User;
+  
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/login");
+  };
 
   return (
     <header className="bg-white h-20">
@@ -31,7 +37,7 @@ const Header = () => {
               Home
             </Link>
           </li>
-          {!user && (
+          {!user ? (
             <>
               <li>
                 <Link href="/login" className="text-ct-dark-600">
@@ -44,30 +50,21 @@ const Header = () => {
                 </Link>
               </li>
             </>
-          )}
-          {user?.role === "ADMIN" && (
+          ) : (
             <>
-              <li>
-                <Link href="/admin" className="text-ct-dark-600">
-                  Admin
-                </Link>
-              </li>
-            </>
-          )}
-          {user && (
-            <>
+              {user.role === "ADMIN" && (
+                <li>
+                  <Link href="/admin" className="text-ct-dark-600">
+                    Admin
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/profile" className="text-ct-dark-600">
                   Profile
                 </Link>
               </li>
-              <li
-                className="cursor-pointer"
-                onClick={() => {
-                  signOut();
-                  router.push("/login");
-                }}
-              >
+              <li className="cursor-pointer" onClick={handleLogout}>
                 Logout
               </li>
             </>

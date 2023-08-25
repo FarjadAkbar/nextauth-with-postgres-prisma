@@ -2,6 +2,7 @@
 import { Payment, columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useEffect, useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 export default function AdminPage() {
   const [data, setData] = useState<Payment[]>();
@@ -16,12 +17,20 @@ export default function AdminPage() {
         });
 
         if (!res.ok) {
-          throw new Error("Fetch failed");
+          toast({
+            title: "Fetch error",
+            variant: "destructive",
+          });
         }
 
         const jsonData = await res.json();
         setData(jsonData);
       } catch (error) {
+        toast({
+          title: "Fetch error",
+          description: `${error}`,
+          variant: "destructive",
+        });
       }
     }
     fetchData();
