@@ -2,8 +2,15 @@
 const nextConfig = {
   experimental: {
     appDir: true,
-    serverComponentsExternalPackages: ["@prisma/client", "bcryptjs"]
+    serverComponentsExternalPackages: ["@prisma/client", "bcryptjs"],
+    outputFileTracingExcludes: {
+      "*": [
+        "node_modules/@swc/core-linux-x64-gnu",
+        "node_modules/@swc/core-linux-x64-musl",
+        "node_modules/@esbuild/linux-x64",
+      ],
+    },
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

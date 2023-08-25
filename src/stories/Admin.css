@@ -1,0 +1,45 @@
+.admin-page {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5%;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 60%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+.dialog-overlay {
+  position: absolute;
+}
+.dialog-box {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 3px 40px rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+button {
+  margin: 0 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ddd;
+}
+
+/* tr:nth-child(even) {
+  background-color: #dddddd;
+} */
