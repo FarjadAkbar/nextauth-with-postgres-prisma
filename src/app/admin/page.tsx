@@ -1,13 +1,15 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
+"use client";
+import { useRouter } from "next/navigation";
 import Header from "@/components/header.component";
 import AdminPage from "@/components/payments/page";
+import { useSession } from "next-auth/react";
 
-export default async function Page() {
-  const session = await getServerSession(authOptions);
-  if (session == null) {
-    return redirect("/login");
+export default  function Page() {
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  if (session === null) {
+    return router.push("/login");
   } else {
     return (
       <>

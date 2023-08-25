@@ -74,7 +74,7 @@ export function CustomTabs() {
     resolver: zodResolver(schema),
   });
   return (
-    <Tabs defaultValue="email" className="w-[400px]">
+    <Tabs defaultValue="email" className="w-full lg:w-[100%] md:w-[400px] lg:w-[400px] xl:w-[400px]">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="email">User</TabsTrigger>
         <TabsTrigger value="password">Admin</TabsTrigger>
@@ -86,8 +86,8 @@ export function CustomTabs() {
             errors={errors}
             handleSubmit={handleSubmit(onSubmit)}
           />
-          <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
-            <p className="text-center font-semibold mx-4 mb-0">OR</p>
+          <div className="mt-0 mb-4 flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
+            <p className="text-center font-semibold">OR</p>
           </div>
 
           <div className="p-6 pt-0">
